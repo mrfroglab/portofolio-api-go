@@ -76,11 +76,12 @@ Configuration (environment): `PORT`, `DATABASE_URL` (Prisma-style `?schema=publi
 
 ## Deployment
 
-Every push to `main` runs lint and tests; on success CI publishes
-`ghcr.io/mrfroglab/portofolio-api-go:latest`. The production host pulls instead of exposing
-a self-hosted runner to a public repo: a systemd timer checks GHCR every 5 minutes, recreates only
-the API container when the image changes, and rolls back to the previous image if the API does not
-answer through the reverse proxy within 30 seconds.
+Every push to `main` runs lint and tests; on success CI also publishes
+`ghcr.io/mrfroglab/portofolio-api-go:latest`. The production host does not pull that image (the
+package is private) and does not expose a self-hosted runner to a public repo. Instead a systemd
+timer checks `main` every 5 minutes, and when the newest commit's `test` check has passed it builds
+the image on the host, recreates only the API container, and rolls back to the previous image if
+the API does not answer through the reverse proxy within 30 seconds.
 
 The API is documented in [`docs/openapi.yaml`](docs/openapi.yaml), and the full product
 requirements are in [`docs/PRD.md`](docs/PRD.md).
